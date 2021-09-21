@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const ytdl = require("ytdl-core");
-const yt = require('youtube-search-without-api-key');
+const { search } = require("./search");
 const prefix = "%";
 const token = "";
 
@@ -20,7 +20,7 @@ client.once("disconnect", () => {
   console.log("Disconnect!");
 });
 
-client.once("guildBanRemove", guild => {
+client.on("guildBanRemove", guild => {
   queue.delete(guild.id);
 });
 
@@ -94,13 +94,13 @@ async function execute(message, serverQueue) {
           url: songInfo.videoDetails.video_url,
      };
   } else {
-    const songInfo = await yt.search(args.join(" "));
-    if (songInfo.length === 0) {
+    const songInfo = await search(args.join(" "));
+    if (!songInfo?.videoUrl) {
       return message.channel.send("I couldn't find any song with that name!");
     }
     song = {
-          title: songInfo[0].title,
-          url: songInfo[0].snippet.url,
+          title: songInfo.videoName,
+          url: songInfo.videoUrl,
      };
   }
 
